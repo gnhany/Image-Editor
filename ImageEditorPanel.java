@@ -12,8 +12,10 @@ import java.awt.event.MouseListener;
 public class ImageEditorPanel extends JPanel implements KeyListener{
 
     Color[][] pixels;
-    Color[][] otherImage = null;
-
+    Color[][] otherImage;
+    final int SHIFT = 1;
+    final int HALF = 2;
+    
     public ImageEditorPanel() {
         BufferedImage imageIn = null;
         BufferedImage otherImageIn = null;
@@ -67,7 +69,6 @@ public class ImageEditorPanel extends JPanel implements KeyListener{
                 result[row][col] = c;
             }
         }
-        // System.out.println("Loaded image: width: " +width + " height: " + height);
         return result;
     }
     public Color[][] makeNewColorArray(BufferedImage image) {
@@ -82,22 +83,6 @@ public class ImageEditorPanel extends JPanel implements KeyListener{
         return result;
     }
 
-    public Color[][] symmetryHorz(Color[][] normal, Color[][] other){
-        for (int row = 0; row < normal.length/2; row++) {
-            for (int col = 0; col < normal[0].length; col++) {
-                other[row][col] = normal[row][col];
-            }
-        }
-        return other;
-    }
-    public Color[][] symmetryVert(Color[][] normal, Color[][] other){
-        for (int row = 0; row < normal.length; row++) {
-            for (int col = 0; col < normal[0].length/2; col++) {
-                other[row][col] = normal[row][col];
-            }
-        }
-        return other;
-    }
 
     public Color[][] flipHorizontal(Color[][] origImage) {
         Color[][] horizImage = new Color[origImage.length][origImage[0].length];
@@ -117,7 +102,7 @@ public class ImageEditorPanel extends JPanel implements KeyListener{
         Color[][] vertImage = new Color[origImage.length][origImage[0].length];
         int vertPixel;
         for (int col = 0; col < origImage[0].length; col++) {
-            vertPixel = origImage.length - 1;
+            vertPixel = origImage.length - SHIFT;
             for (int row = 0; row < origImage.length; row++) {
                 vertImage[row][col] = origImage[vertPixel][col];
                 vertPixel--;
@@ -147,48 +132,7 @@ public class ImageEditorPanel extends JPanel implements KeyListener{
         
         return newArr;
     }
-    public Color[][] brighten(Color[][] image){
-        Color[][] newArr = new Color[image.length][image[0].length];
-        for (int row = 0; row < newArr.length; row++) {
-            for (int col = 0; col < newArr[0].length; col++) {
-                newArr[row][col] = image[row][col].brighter();
-                
-            }
-        }
-        
-        return newArr;
-    }
-    public Color[][] darken(Color[][] image){
-        Color[][] newArr = new Color[image.length][image[0].length];
-        for (int row = 0; row < newArr.length; row++) {
-            for (int col = 0; col < newArr[0].length; col++) {
-                newArr[row][col] = image[row][col].darker();
-                
-            }
-        }
-        
-        return newArr;
-    }
-    public Color[][] blackAndWhite(Color[][] image){
-        Color[][] newArr = new Color[image.length][image[0].length];
-        for (int row = 0; row < newArr.length; row++) {
-            for (int col = 0; col < newArr[0].length; col++){
-                int red = image[row][col].getRed();
-                int green = image[row][col].getGreen();
-                int blue = image[row][col].getBlue();
-                if((red + green + blue) >= 382){
-                    newArr[row][col] = new Color(255,255,255);
-                }else{
-                    newArr[row][col] = new Color(0,0,0);
-                }
-                
-            }
-        }
-        
-        return newArr;
-    }
-
-    public Color[][] blur(Color[][] image){
+     public Color[][] blur(Color[][] image){
         Color[][] newArr = new Color[image.length][image[0].length];
         final int BLUR_SIZE = 9;
         int numPixels = 0;
@@ -220,6 +164,67 @@ public class ImageEditorPanel extends JPanel implements KeyListener{
             }
         }
         return newArr;
+    }
+
+      public Color[][] blackAndWhite(Color[][] image){
+        Color[][] newArr = new Color[image.length][image[0].length];
+        final int MID_OF_MAX_COLOR = 382;
+        final int MAX_INDV_COLOR = 255;
+        for (int row = 0; row < newArr.length; row++) {
+            for (int col = 0; col < newArr[0].length; col++){
+                int red = image[row][col].getRed();
+                int green = image[row][col].getGreen();
+                int blue = image[row][col].getBlue();
+                if((red + green + blue) >= MID_OF_MAX_COLOR){
+                    newArr[row][col] = new Color(MAX_INDV_COLOR,MAX_INDV_COLOR,MAX_INDV_COLOR);
+                }else{
+                    newArr[row][col] = new Color(0,0,0);
+                }
+                
+            }
+        }
+        
+        return newArr;
+    }
+    
+    public Color[][] brighten(Color[][] image){
+        Color[][] newArr = new Color[image.length][image[0].length];
+        for (int row = 0; row < newArr.length; row++) {
+            for (int col = 0; col < newArr[0].length; col++) {
+                newArr[row][col] = image[row][col].brighter();
+                
+            }
+        }
+        
+        return newArr;
+    }
+    public Color[][] darken(Color[][] image){
+        Color[][] newArr = new Color[image.length][image[0].length];
+        for (int row = 0; row < newArr.length; row++) {
+            for (int col = 0; col < newArr[0].length; col++) {
+                newArr[row][col] = image[row][col].darker();
+                
+            }
+        }
+        
+        return newArr;
+    }
+   
+      public Color[][] symmetryHorz(Color[][] normal, Color[][] other){
+        for (int row = 0; row < normal.length/HALF; row++) {
+            for (int col = 0; col < normal[0].length; col++) {
+                other[row][col] = normal[row][col];
+            }
+        }
+        return other;
+    }
+    public Color[][] symmetryVert(Color[][] normal, Color[][] other){
+        for (int row = 0; row < normal.length; row++) {
+            for (int col = 0; col < normal[0].length/2; col++) {
+                other[row][col] = normal[row][col];
+            }
+        }
+        return other;
     }
 
 
